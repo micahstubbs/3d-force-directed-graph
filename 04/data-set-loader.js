@@ -101,16 +101,9 @@ function getGraphDataSets() {
             data.nodes.forEach((node, i) => { 
                 node.id = i;
                 node.groupLabel =  node.group;
-                node.group = Number(node.group.split(' ')[1]);
+                node.group = Number(node.group.split(' ')[1]) || 0;
                 nodes[node.id] = node;
             });
-
-            // use names for link property values 
-            // instead of nodes array index values
-            // data.links.forEach(link => {
-            //     link.source = data.nodes[link.source].name;
-            //     link.target = data.nodes[link.target].name;
-            // });
 
             console.log('data from loadGroups', data);
             console.log('nodes from loadGroups', nodes);
