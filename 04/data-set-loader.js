@@ -100,6 +100,8 @@ function getGraphDataSets() {
             // Index by name
             data.nodes.forEach((node, i) => { 
                 node.id = i;
+                node.groupLabel =  node.group;
+                node.group = Number(node.group.split(' ')[1]);
                 nodes[node.id] = node;
             });
 

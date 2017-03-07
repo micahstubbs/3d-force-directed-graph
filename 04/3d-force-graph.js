@@ -128,7 +128,7 @@ function ForceGraph3D() {
 			graph.addLink(...link, {});
 		}
 
-		console.log('graph from 3d-force-graph', graph);
+		// console.log('graph from 3d-force-graph', graph);
 
 		// Add WebGL objects
 		graph.forEachNode(node => {
