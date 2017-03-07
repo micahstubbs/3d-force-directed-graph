@@ -1,0 +1,1 @@
+This is a graph of groups within a programme of work, and the members of the groups.  You can toggle whether you see all members, or just those who are members of two or more groups.

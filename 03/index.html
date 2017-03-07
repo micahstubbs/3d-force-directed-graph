@@ -1,0 +1,181 @@
+﻿<!DOCTYPE html>
+
+
+<html>
+<meta charset="utf-8">
+<title>Group Members</title>
+<style>
+<style>
+
+.link {
+    stroke: #000;
+  stroke-opacity: 1;
+}
+
+.node text {
+  pointer-events: none;
+  font: 10px sans-serif;
+}
+
+</style>
+<body>
+<h1>Group membership</h1>
+
+<div class="options">
+	<span><label for="hideSingles"><input type="checkbox" name="hideSingles" value="hideSingles"></input> Hide members of only one group</label></span>
+</div>
+
+<div id="viz"></div>
+
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script>
+
+var width = 1600,
+    height = 800
+	radius = 5;
+
+var svg = d3.select("#viz").append("svg")
+    .attr("width", width)
+    .attr("height", height);
+	
+	svg.append("svg:rect")
+    .attr("width", width)
+    .attr("height", height)
+    .style("stroke", "#000")
+	.style("fill", "#fff");
+	
+var k = Math.sqrt(98 / (width * height));
+
+
+    
+
+var force = d3.layout.force()
+	//.charge(-10 / k)
+    //.gravity(100 * k)
+
+    .gravity(.07)
+    .distance(75)
+    .charge(-200)
+    .size([width, height]);
+	
+var color = d3.scale.category20();
+
+
+d3.json("groups.json", function(error, json) {
+  force
+      .nodes(json.nodes)
+      .links(json.links)
+      .start();
+	  
+d3.selectAll("input[name='hideSingles']")
+	.on("click", hideSingles);
+	  
+	  var drag = force.drag()
+    .on("dragstart", dragstart);
+
+  var link = svg.selectAll(".link")
+      .data(json.links)
+    .enter().append("line")
+      .attr("class", "link")
+	  .style("stroke", "Black")
+	  .style("stroke-opacity", ".3")
+	  .style("stroke-width", 2 );
+
+  var node = svg.selectAll(".node")
+      .data(json.nodes)
+    .enter().append("g")
+      .attr("class", "node")
+	  .on("dblclick", dblclick)
+	  
+      .call(drag)
+      .call(force.drag);
+
+  node.append("circle")
+      .attr("class", "node")
+      .attr("r", radius)
+	  //.on("click", hideclick) //hide this if
+	  .style("fill", function(d) { return color(d.group); });
+
+   d3.selectAll("circle")
+		.attr("r", function(d) { 
+			if (d.group === "Group") { return "10"}
+			else return "5" });
+  
+  node.append("text")
+      .attr("dx", 12)
+      .attr("dy", ".35em")
+      .text(function(d) { return d.name });
+
+  force.on("tick", function() {
+  
+    node.attr("cx", function(d) { return d.x = Math.max(radius, Math.min(width - radius, d.x)); })
+        .attr("cy", function(d) { return d.y = Math.max(radius, Math.min(height - radius, d.y)); });
+    link.attr("x1", function(d) { return d.source.x; })
+        .attr("y1", function(d) { return d.source.y; })
+        .attr("x2", function(d) { return d.target.x; })
+        .attr("y2", function(d) { return d.target.y; });
+
+    node.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+  });
+  
+	function dblclick(d) {
+	  d3.select(this).classed("fixed", d.fixed = false);
+	}
+
+	function dragstart(d) {
+	  d3.select(this).classed("fixed", d.fixed = true);
+	}
+	
+
+var singlesHidden = false;
+
+function hideSingles() {
+
+	if (singlesHidden) { //if singlesHidden is True
+		console.log("before " +singlesHidden)
+		
+		d3.selectAll("circle")
+			.style("visibility", "visible");
+		
+		d3.selectAll("text")
+			.style("display", "block");
+		
+		d3.selectAll("line")
+			.style("stroke-opacity", "0.3")
+		
+		singlesHidden = false;
+		console.log("after " +singlesHidden)
+	}
+	
+	else { //if singlesHidden is False 
+		console.log("before " +singlesHidden)
+		
+		d3.selectAll("circle")
+			.style("visibility", function(d) {
+				if (d.single === "yes") { return "hidden";} 
+				else {return "visible";}
+			});
+		
+		d3.selectAll("text")
+			.style("display", function(d) {
+				if (d.single === "yes") { return "none";} 
+				else {return "visible";}
+			});
+			
+			
+		d3.selectAll("line")
+			.style("stroke-opacity", function(d) {
+				if (d.source.single === "yes") { console.log("got here"); return 0; }
+				else if (d.target.single === "yes") { return 0; }
+				else { console.log("got 0.2"); return 0.3;}
+			});
+		
+		
+		singlesHidden = true;
+		console.log("after " +singlesHidden)
+	}
+}
+	
+});
+
+</script>
